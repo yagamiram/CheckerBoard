@@ -1,6 +1,8 @@
 class BoardController
   constructor: (@containerId, @assets) ->
+  
   drawboard: ->
+    squareSize = 10
     viewWidth = @containerId.offsetWidth;
     viewHeight = @containerId.offsetHeight;
     renderer = new THREE.WebGLRenderer()
@@ -11,8 +13,9 @@ class BoardController
       viewWidth / viewHeight,
       1,
       1000)
-    camera.position.set(0, 120, 150)
+    camera.position.set(squareSize * 4, 120, 150)
     cameraController = new THREE.OrbitControls(camera, @containerId)
+    cameraController.center = new THREE.Vector3(squareSize * 4, 0, squareSize * 4)
     scene.add(camera)
     @containerId.appendChild(renderer.domElement)
     @InitLights(scene)
@@ -52,24 +55,61 @@ class BoardController
     return materials    
 
   InitObjects: (scene, cameraController, renderer, camera, materials)->
+    squareSize = 10
     loader = new THREE.JSONLoader()
     totalObjectsToLoad = 2
     loadedObjects = 0
     board_geometry = (geom) ->
       boardModel = new THREE.Mesh(geom, materials.boardMaterial)
+      boardModel.position.y = -0.02
       scene.add(boardModel)
+      checkLoad()
+      return
 
     loader.load(@assets + 'board.js', board_geometry)
     piece_geometry = (geometry) ->
       pieceGeometry = geometry
-    loader.load(@assets + 'piece.js', piece_geometry)
-    scene.add(new THREE.AxisHelper(200))
-    onAnimationFrame = ->
-      requestAnimationFrame onAnimationFrame
-      cameraController.update()
-      renderer.render scene, camera  
+      checkLoad()
       return
-    onAnimationFrame()
+
+    loader.load(@assets + 'piece.js', piece_geometry)
+
+    # Add ground
+    groundModel = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 1, 1), materials.groundMaterial)
+    groundModel.position.set(squareSize * 4, -1.52, squareSize * 4)
+    groundModel.rotation.x = -90 * Math.PI / 180
+    scene.add(groundModel)    
+    scene.add(new THREE.AxisHelper(200))
+    SquareMaterial
+    for row in [0..7]
+      for col in [0..7]
+        if (row + col) % 2 == 0
+          SquareMaterial = materials.LightSquareMaterial
+          console.log "Even"
+        else
+          SquareMaterial = materials.darkSquareMaterial
+          console.log "Odd"
+        Square = new THREE.Mesh(new THREE.PlaneGeometry(squareSize, squareSize, 1, 1), SquareMaterial)
+        console.log Square
+        Square.position.x = col * squareSize + squareSize / 2
+        console.log col, squareSize, squareSize/2, Square.position.x
+        Square.position.z = row * squareSize + squareSize / 2
+        console.log Square.position.z
+        Square.position.y = -0.01
+        console.log Square.position.y
+        Square.rotation.x = -90 * Math.PI / 180
+        console.log Square.rotation.x
+        scene.add(Square)
+    checkLoad = ->
+      loadedObjects += 1
+      if loadedObjects is totalObjectsToLoad      
+        onAnimationFrame = ->
+          requestAnimationFrame onAnimationFrame
+          cameraController.update()
+          renderer.render scene, camera  
+          return
+        onAnimationFrame()
+        return
     return
 
 class Game
