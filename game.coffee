@@ -1,8 +1,9 @@
 class BoardController
   constructor: (@containerId, @assets) ->
-  
+    
   drawboard: ->
     squareSize = 10
+    pieceGeometry = null
     viewWidth = @containerId.offsetWidth;
     viewHeight = @containerId.offsetHeight;
     renderer = new THREE.WebGLRenderer()
@@ -21,6 +22,10 @@ class BoardController
     @InitLights(scene)
     materials = @InitMaterials()
     @InitObjects(scene, cameraController, renderer, camera, materials)
+    console.log "Retured from InitObjects"
+    console.log "the piece geometry value is", pieceGeometry
+    return
+
   InitLights: (scene)->
     lights = {}
     lights.topLight = new THREE.PointLight()
@@ -69,14 +74,14 @@ class BoardController
       scene.add(boardModel)
       checkLoad()
       return
-
+    console.log "Calling loader function to process board.js"
     loader.load(@assets + 'board.js', board_geometry)
     piece_geometry = (geometry) ->
-      console.log geometry
-      pieceGeometry = geometry
+      console.log "inside piece geometry", geometry
+      @pieceGeometry = geometry
       checkLoad()
       return
-
+    console.log "Calling loader fn to process piece.js"
     loader.load(@assets + 'piece.js', piece_geometry)
 
     # Add ground
@@ -109,10 +114,12 @@ class BoardController
         Square.position.y = -0.01
         Square.rotation.x = -90 * Math.PI / 180
         scene.add(Square)
-      console.log "random_direction is", direction_row
+      #console.log "random_direction is", direction_row
       direction_board.push direction_row
     console.log "direction board is", direction_board
+
     checkLoad = ->
+      console.log "checkLoad"
       loadedObjects += 1
       if loadedObjects is totalObjectsToLoad      
         onAnimationFrame = ->
@@ -121,6 +128,31 @@ class BoardController
           renderer.render scene, camera  
           return
         onAnimationFrame()
+        console.log "After animation frame", @pieceGeometry
+        # Add a piece into the board in a random position
+        AddPiece = (piece) ->
+          boardToWorld = (pos)->
+            x = (1 + pos[1]) * squareSize - squareSize/2
+            z = (1 + pos[0]) * squareSize - squareSize/2
+            return new THREE.Vector3(x, 0, z)
+          pieceMesh = new THREE.Mesh(@pieceGeometry)
+          pieceObjGroup = new THREE.Object3D()
+          pieceObjGroup.color = piece.color
+          pieceObjGroup.material = materials.whitePieceMaterial
+          shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(squareSize, squareSize, 1, 1), materials.pieceShadowPlane)
+          shadowPlane.rotation.x = -90 * Math.PI / 180
+          pieceObjGroup.add(pieceMesh)
+          pieceObjGroup.add(shadowPlane)
+          pieceObjGroup.position = boardToWorld(piece.pos)
+          #board[piece.pos[0]][piece.pos[1]] = pieceObjGroup
+          scene.add(pieceObjGroup)
+          return
+        random_piece = { color : 0x9f2200, pos : []}
+        # Get a random location
+        random_piece.pos.push Math.floor(Math.random()*8)
+        random_piece.pos.push Math.floor(Math.random()*8)
+        console.log "random piece is", random_piece
+        AddPiece(random_piece)
         return
     return
 
@@ -128,10 +160,13 @@ class Game
   constructor: (@containerId, @assets) ->
     bc = new BoardController(@containerId, @assets)
     bc.drawboard()
+    console.log "returned from drawboard"
 
 class Checkers
   @containerId = document.getElementById('boardContainer')
   @assetsId = '3d_assets/'
   @game = new Game(@containerId, @assetsId)
+  console.log "returned from Game"
+  
 
 c = new Checkers()
