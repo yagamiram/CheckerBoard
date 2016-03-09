@@ -34,8 +34,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
 
-	// 65 /*A*/, 83 /*S*/, 68 /*D*/
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, ROTATE: 65, ZOOM: 83, PAN: 68 };
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// internals
 
@@ -223,32 +222,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		if ( state === STATE.NONE )
-		{
-			if ( event.button === 0 )
-				state = STATE.ROTATE;
-			if ( event.button === 1 )
-				state = STATE.ZOOM;
-			if ( event.button === 2 )
-				state = STATE.PAN;
-		}
-		
-		
-		if ( state === STATE.ROTATE ) {
+		if ( event.button === 0 ) {
 
-			//state = STATE.ROTATE;
+			state = STATE.ROTATE;
 
 			rotateStart.set( event.clientX, event.clientY );
 
-		} else if ( state === STATE.ZOOM ) {
+		} else if ( event.button === 1 ) {
 
-			//state = STATE.ZOOM;
+			state = STATE.ZOOM;
 
 			zoomStart.set( event.clientX, event.clientY );
 
-		} else if ( state === STATE.PAN ) {
+		} else if ( event.button === 2 ) {
 
-			//state = STATE.PAN;
+			state = STATE.PAN;
 
 		}
 
@@ -263,8 +251,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		
-		
 		if ( state === STATE.ROTATE ) {
 
 			rotateEnd.set( event.clientX, event.clientY );
@@ -351,7 +337,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( event.keyCode ) {
 
-			/*case scope.keys.UP:
+			case scope.keys.UP:
 				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
 				break;
 			case scope.keys.BOTTOM:
@@ -363,30 +349,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 			case scope.keys.RIGHT:
 				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
 				break;
-			*/
-			case scope.keys.ROTATE:
-				state = STATE.ROTATE;
-				break;
-			case scope.keys.ZOOM:
-				state = STATE.ZOOM;
-				break;
-			case scope.keys.PAN:
-				state = STATE.PAN;
-				break;
-				
-		}
-
-	}
-	
-	function onKeyUp( event ) {
-
-		switch ( event.keyCode ) {
-
-			case scope.keys.ROTATE:
-			case scope.keys.ZOOM:
-			case scope.keys.PAN:
-				state = STATE.NONE;
-				break;
 		}
 
 	}
@@ -395,8 +357,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-	window.addEventListener( 'keydown', onKeyDown, false );
-	window.addEventListener( 'keyup', onKeyUp, false );
+	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 };
 
