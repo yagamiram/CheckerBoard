@@ -39,8 +39,8 @@ class BoardController
     materials.groundMaterial = new THREE.MeshBasicMaterial({
       transparent : true, 
       map: THREE.ImageUtils.loadTexture(@assets + 'ground.png')})
-    materials.darkSquareMaterial = new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + 'square_dark_texture.jpg')})
-    materials.LightSquareMaterial = new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + 'square_light_texture.jpg')})
+    #materials.darkSquareMaterial = new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + 'square_dark_texture.jpg')})
+    #materials.LightSquareMaterial = new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + 'square_light_texture.jpg')})
     materials.whitePieceMaterial = new THREE.MeshPhongMaterial({
       color : 0xe9e4bd,
       shininess : 20
@@ -53,13 +53,17 @@ class BoardController
       transparent : true, 
       map: THREE.ImageUtils.loadTexture(@assets + 'piece_shadow.png')})
     return materials    
-
+  DarkSquareMaterial: (direction) ->
+    return new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + direction + '_arrow_dark_square_texture.png')})
+  LightSquareMaterial: (direction) ->
+    return new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + direction + '_arrow_light_square_texture.png')})
   InitObjects: (scene, cameraController, renderer, camera, materials)->
     squareSize = 10
     loader = new THREE.JSONLoader()
     totalObjectsToLoad = 2
     loadedObjects = 0
     board_geometry = (geom) ->
+      console.log geom
       boardModel = new THREE.Mesh(geom, materials.boardMaterial)
       boardModel.position.y = -0.02
       scene.add(boardModel)
@@ -68,6 +72,7 @@ class BoardController
 
     loader.load(@assets + 'board.js', board_geometry)
     piece_geometry = (geometry) ->
+      console.log geometry
       pieceGeometry = geometry
       checkLoad()
       return
@@ -81,25 +86,32 @@ class BoardController
     scene.add(groundModel)    
     scene.add(new THREE.AxisHelper(200))
     SquareMaterial
+    directions = ['up','down','left','right']
+    ###
+    UP is 0
+    DOWN is 1
+    LEFT is 2
+    RIGHT is 3
+    ###
+    direction_board = []
     for row in [0..7]
+      direction_row = []
       for col in [0..7]
+        random_direction = Math.floor(Math.random()*directions.length)
+        direction_row.push random_direction
         if (row + col) % 2 == 0
-          SquareMaterial = materials.LightSquareMaterial
-          console.log "Even"
+          SquareMaterial = @LightSquareMaterial(directions[random_direction])
         else
-          SquareMaterial = materials.darkSquareMaterial
-          console.log "Odd"
+          SquareMaterial = @DarkSquareMaterial(directions[random_direction])
         Square = new THREE.Mesh(new THREE.PlaneGeometry(squareSize, squareSize, 1, 1), SquareMaterial)
-        console.log Square
         Square.position.x = col * squareSize + squareSize / 2
-        console.log col, squareSize, squareSize/2, Square.position.x
         Square.position.z = row * squareSize + squareSize / 2
-        console.log Square.position.z
         Square.position.y = -0.01
-        console.log Square.position.y
         Square.rotation.x = -90 * Math.PI / 180
-        console.log Square.rotation.x
         scene.add(Square)
+      console.log "random_direction is", direction_row
+      direction_board.push direction_row
+    console.log "direction board is", direction_board
     checkLoad = ->
       loadedObjects += 1
       if loadedObjects is totalObjectsToLoad      
