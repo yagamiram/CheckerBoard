@@ -70,7 +70,6 @@ class BoardController
     return new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture(@assets + direction + '_arrow_light_square_texture.png')})
   InitObjects: ()->
     that = @
-    squareSize = 10
     loader = new THREE.JSONLoader()
     totalObjectsToLoad = 2
     loadedObjects = 0
@@ -83,14 +82,13 @@ class BoardController
       boardModel = new THREE.Mesh(geom, that.materials.boardMaterial)
       boardModel.position.y = -0.02
       that.scene.add(boardModel)
-      #checkLoad()
-      onAnimationFrame()
+      Animate()
       return
     console.log "Calling loader function to process board.js"
     loader.load(@assets + 'board.js', board_geometry)
     # Add ground
     groundModel = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 1, 1), that.materials.groundMaterial)
-    groundModel.position.set(squareSize * 4, -1.52, squareSize * 4)
+    groundModel.position.set(@squareSize * 4, -1.52, @squareSize * 4)
     groundModel.rotation.x = -90 * Math.PI / 180
     that.scene.add(groundModel)    
     @scene.add(new THREE.AxisHelper(200))
@@ -115,39 +113,28 @@ class BoardController
           SquareMaterial = @LightSquareMaterial(directions[random_direction])
         else
           SquareMaterial = @DarkSquareMaterial(directions[random_direction])
-        Square = new THREE.Mesh(new THREE.PlaneGeometry(squareSize, squareSize, 1, 1), SquareMaterial)
-        Square.position.x = col * squareSize + squareSize / 2
-        Square.position.z = row * squareSize + squareSize / 2
+        Square = new THREE.Mesh(new THREE.PlaneGeometry(@squareSize, @squareSize, 1, 1), SquareMaterial)
+        Square.position.x = col * @squareSize + @squareSize / 2
+        Square.position.z = row * @squareSize + @squareSize / 2
         Square.position.y = -0.01
         Square.rotation.x = -90 * Math.PI / 180
         that.scene.add(Square)
       direction_board.push direction_row
       visited_board.push visited_row
     console.log "direction board is", direction_board
-    move_object = (distance = 0.0) ->
-      console.log "move object"
-      pieceObjGroup.position.x += distance
-      return # end of the move object function
     boardToWorld = (pos)->
-      x = (1 + pos[1]) * squareSize - squareSize/2
-      z = (1 + pos[0]) * squareSize - squareSize/2
+      x = (1 + pos[1]) * that.squareSize - that.squareSize/2
+      z = (1 + pos[0]) * that.squareSize - that.squareSize/2
       return new THREE.Vector3(x, 0, z)
     AddPiece = (piece) ->
       pieceMesh = new THREE.Mesh(@pieceGeometry)
       pieceObjGroup = new THREE.Object3D()
       pieceObjGroup.color = piece.color
       pieceObjGroup.material = that.materials.whitePieceMaterial
-      shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(squareSize, squareSize, 1, 1), that.materials.pieceShadowPlane)
-      shadowPlane.rotation.x = -90 * Math.PI / 180
-      ###
-      This commented because during this call the @pieceGeometry is not initialized and
-      and it is set to NUll.
-      PieceMesh is mesh of @PieceGeometry
-      ###
-      #pieceObjGroup.add(pieceMesh)  
+      shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(that.squareSize, that.squareSize, 1, 1), that.materials.pieceShadowPlane)
+      shadowPlane.rotation.x = -90 * Math.PI / 180 
       pieceObjGroup.add(shadowPlane)
       pieceObjGroup.position = boardToWorld(piece.pos)
-      #board[piece.pos[0]][piece.pos[1]] = pieceObjGroup
       console.log "pieceObjGroup",pieceObjGroup
       that.scene.add(pieceObjGroup)
       return
@@ -158,23 +145,12 @@ class BoardController
     console.log "random piece is", random_piece
     current_location = [random_piece.pos[0] , random_piece.pos[1]]
     AddPiece(random_piece)
-    sleep = (ms) ->
-      start = new Date().getTime()
-      continue while new Date().getTime() - start < ms
     create_tween = (from, to_x, to_z)->
       # create the tween
       if ( is_tween_running is false )
         is_tween_running = true 
-      values1 = 
-        x: from.x
-        y: 0
-        z: from.z
-        t: 0
-      target1 = 
-        x: to_x
-        y: 0
-        z: to_z
-        t: 0
+      values1 = {x: from.x, y: 0, z: from.z, t: 0}
+      target1 = {x: to_x, y: 0, z: to_z, t: 0}
       tween1 = new (TWEEN.Tween)(values1).to(target1, 3000)
       console.log "from is", values1
       console.log "to is", target1
@@ -198,8 +174,8 @@ class BoardController
           return
         visited_board[current_location[0]][current_location[1]] = true
         if direction_board[current_location[0]][current_location[1]] is 0
-          x = (1 + current_location[1]) * squareSize - squareSize/2
-          z = (1 + current_location[0]-1) * squareSize - squareSize/2
+          x = (1 + current_location[1]) * that.squareSize - that.squareSize/2
+          z = (1 + current_location[0]-1) * that.squareSize - that.squareSize/2
           console.log "up"
           from = boardToWorld([current_location[0], current_location[1]])            
           console.log "from:", from.x , 0, from.z
@@ -207,8 +183,8 @@ class BoardController
           create_tween(from, x, z)
           current_location = [current_location[0]-1, current_location[1]]
         else if direction_board[current_location[0]][current_location[1]] is 1
-          x = (1 + current_location[1]) * squareSize - squareSize/2
-          z = (1 + current_location[0]+1) * squareSize - squareSize/2
+          x = (1 + current_location[1]) * that.squareSize - that.squareSize/2
+          z = (1 + current_location[0]+1) * that.squareSize - that.squareSize/2
           console.log "down"
           from = boardToWorld([current_location[0], current_location[1]])            
           console.log "from:", from.x , 0, from.z
@@ -216,8 +192,8 @@ class BoardController
           create_tween(from, x, z)
           current_location = [current_location[0]+1, current_location[1]]      
         else if direction_board[current_location[0]][current_location[1]] is 2   
-          x = (1 + current_location[1]-1) * squareSize - squareSize/2
-          z = (1 + current_location[0]) * squareSize - squareSize/2
+          x = (1 + current_location[1]-1) * that.squareSize - that.squareSize/2
+          z = (1 + current_location[0]) * that.squareSize - that.squareSize/2
           console.log "lrft"
           from = boardToWorld([current_location[0], current_location[1]])            
           console.log "from:", from.x , 0, from.z
@@ -225,8 +201,8 @@ class BoardController
           create_tween(from, x, z)
           current_location = [current_location[0], current_location[1]-1]
         else
-          x = (1 + current_location[1]+1) * squareSize - squareSize/2
-          z = (1 + current_location[0]) * squareSize - squareSize/2
+          x = (1 + current_location[1]+1) * that.squareSize - that.squareSize/2
+          z = (1 + current_location[0]) * that.squareSize - that.squareSize/2
           console.log "right"
           from = boardToWorld([current_location[0], current_location[1]])            
           console.log "from:", from.x , 0, from.z
@@ -234,15 +210,14 @@ class BoardController
           create_tween(from, x, z)
           current_location = [current_location[0], current_location[1]+1]              
       return # end of the update function
-    onAnimationFrame = ->
-      requestAnimationFrame onAnimationFrame
+    Animate = ->
+      requestAnimationFrame Animate
       that.cameraController.update()
       that.renderer.render that.scene, that.camera
       update()
       TWEEN.update();
-      return
-    #onAnimationFrame()
-    return
+      return # End of Animate Function
+    return # End of Init Objects
 containerId = document.getElementById('boardContainer')
 assetsId = '3d_assets/'
 board = new BoardController(containerId, assetsId)
