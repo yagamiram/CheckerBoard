@@ -52,14 +52,6 @@ class BoardController
     @materials.groundMaterial = new THREE.MeshBasicMaterial({
       transparent : true, 
       map: THREE.ImageUtils.loadTexture(@assets + 'ground.png')})
-    @materials.whitePieceMaterial = new THREE.MeshPhongMaterial({
-      color : 0xe9e4bd,
-      shininess : 20
-      })
-    @materials.blackPieceMaterial = new THREE.MeshPhongMaterial({
-      color : 0x9f2200,
-      shininess : 20
-      })
     @materials.pieceShadowPlane = new THREE.MeshBasicMaterial({
       transparent : true, 
       map: THREE.ImageUtils.loadTexture(@assets + 'piece_shadow.png')})
@@ -129,7 +121,6 @@ class BoardController
       pieceMesh = new THREE.Mesh(@pieceGeometry)
       pieceObjGroup = new THREE.Object3D()
       pieceObjGroup.color = piece.color
-      pieceObjGroup.material = that.materials.whitePieceMaterial
       shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(that.squareSize, that.squareSize, 1, 1), that.materials.pieceShadowPlane)
       shadowPlane.rotation.x = -90 * Math.PI / 180 
       pieceObjGroup.add(shadowPlane)
