@@ -74,7 +74,6 @@ class BoardController
     totalObjectsToLoad = 2
     loadedObjects = 0
     pieceObjGroup = null
-    keyboard = new THREEx.KeyboardState()
     is_tween_running = false
     current_location = []
     board_geometry = (geom) ->
@@ -91,7 +90,7 @@ class BoardController
     groundModel.position.set(@squareSize * 4, -1.52, @squareSize * 4)
     groundModel.rotation.x = -90 * Math.PI / 180
     that.scene.add(groundModel)    
-    @scene.add(new THREE.AxisHelper(200))
+    #@scene.add(new THREE.AxisHelper(200))
     SquareMaterial
     directions = ['up','down','left','right']
     ###
