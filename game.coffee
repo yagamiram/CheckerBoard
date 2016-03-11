@@ -83,17 +83,11 @@ class BoardController
       boardModel = new THREE.Mesh(geom, that.materials.boardMaterial)
       boardModel.position.y = -0.02
       that.scene.add(boardModel)
-      checkLoad()
+      #checkLoad()
+      onAnimationFrame()
       return
     console.log "Calling loader function to process board.js"
     loader.load(@assets + 'board.js', board_geometry)
-    piece_geometry = (geometry) ->
-      console.log "inside piece geometry", geometry
-      @pieceGeometry = geometry
-      checkLoad()
-      return
-    console.log "Calling loader fn to process piece.js"
-    loader.load(@assets + 'piece.js', piece_geometry)
     # Add ground
     groundModel = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 1, 1), that.materials.groundMaterial)
     groundModel.position.set(squareSize * 4, -1.52, squareSize * 4)
@@ -199,7 +193,7 @@ class BoardController
     update = ->
       visited = []
       while ( is_tween_running == false ) 
-        if current_location[0] in [0,8] or current_location[1] in [0, 8] or visited_board[current_location[0]][current_location[1]] is true 
+        if current_location[0] in [-1,8] or current_location[1] in [-1, 8] or visited_board[current_location[0]][current_location[1]] is true 
           console.log "cycle formed"
           return
         visited_board[current_location[0]][current_location[1]] = true
@@ -240,19 +234,15 @@ class BoardController
           create_tween(from, x, z)
           current_location = [current_location[0], current_location[1]+1]              
       return # end of the update function
-    checkLoad = ->
-      console.log "checkLoad"
-      loadedObjects += 1
-      if loadedObjects is totalObjectsToLoad      
-        onAnimationFrame = ->
-          requestAnimationFrame onAnimationFrame
-          that.cameraController.update()
-          that.renderer.render that.scene, that.camera
-          update()
-          TWEEN.update();
-          return
-        onAnimationFrame()
-    return 
+    onAnimationFrame = ->
+      requestAnimationFrame onAnimationFrame
+      that.cameraController.update()
+      that.renderer.render that.scene, that.camera
+      update()
+      TWEEN.update();
+      return
+    #onAnimationFrame()
+    return
 containerId = document.getElementById('boardContainer')
 assetsId = '3d_assets/'
 board = new BoardController(containerId, assetsId)
