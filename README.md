@@ -29,6 +29,17 @@ Dat-Gui.js
 [Three.js](https://github.com/mrdoob/three.js) [Tween.js](https://github.com/CreateJS/TweenJS) [Dat.gui.js] (https://github.com/dataarts/dat.gui)
 [Electron] (https://github.com/atom/electron)
 
+### Project Description ###
+
+A 3D checker-board is created and a coin is placed on the board in a random position. Each cell in the checker board
+has any one of the up, down, left and right directions on it. The coin will as per the direction on the cell in which 
+it resides.
+
+The coin stop when it falls off from the board or it ends in a loop/cycle.
+
+Sample video of the link:
+
+
 ```html
 <script src="js/three.min.js"></script>
 ```
