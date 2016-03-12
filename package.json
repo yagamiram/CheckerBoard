@@ -1,8 +1,30 @@
 {
-  "name":    "helloworld",
+  "name": "3d_checker_board",
   "version": "0.0.1",
-  "main":    "main.js",
-    "devDependencies": {
+  "main": "main.js",
+  "devDependencies": {
     "coffee-script": "~1.10.0"
-  }
+  },
+  "description": "This is a repo for CheckerBoard - Robotics Challenge",
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yagamiram/CheckerBoard.git"
+  },
+  "keywords": [
+    "CoffeeScript",
+    "Electron",
+    "Three.js",
+    "Tween.js",
+    "Data.gui.js"
+  ],
+  "author": "YagamiRam ElricTK",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yagamiram/CheckerBoard/issues"
+  },
+  "homepage": "https://github.com/yagamiram/CheckerBoard#readme"
 }
