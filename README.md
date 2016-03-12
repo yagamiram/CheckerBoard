@@ -52,11 +52,12 @@ In cmd prompt:
 5. node_modules\.bin\electron project_dir
 ```
 ### Features in the Project ###
+```
 360 rotation of the 3D checker board.
-Camera zoom's in and out with respect to mouse scrolling.
+Camera zooms in and out with respect to mouse scrolling.
 Can stop/pause the game at any point of time
 Can restart/re-size the game at any point of time
-
+```
 ### Requirements ###
 WebGL
 
