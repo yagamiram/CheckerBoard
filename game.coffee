@@ -243,11 +243,11 @@ class BoardController
           ##console.log "the current_location is", that.current_location[0], that.current_location[1] 
           if 0 > that.current_location[0] or that.current_location[0] > that.row or 0 > that.current_location[1] or that.current_location[1] > that.col 
             ##console.log "Cycle formed", that.current_location[0], that.current_location[1]
-            alert "Oops! The coin fallen from the Londen Bridge aka from the Checker Board! Press Restart to start a new game"
+            alert "Oops! The coin fallen from the Londen Bridge aka from the Checker Board! Press Restart for a new game"
             that.cycle_formed = true
             return
           else if that.visited_board[that.current_location[0]][that.current_location[1]] is true
-            alert "Oops ! The coin is trapped in a cycle! Press Restart to start a new game"
+            alert "Oops ! The coin is trapped in a cycle! Press Restart for a new game"
             that.cycle_formed = true
             return
           that.visited_board[that.current_location[0]][that.current_location[1]] = true

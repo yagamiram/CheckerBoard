@@ -17,5 +17,5 @@ app.on 'ready', ->
   #document.write("hi");
   # and load the index.html of the app.
   mainWindow.loadURL 'file://' + __dirname + '/index.html'
-  mainWindow.webContents.openDevTools();
+  #mainWindow.webContents.openDevTools();
   return
