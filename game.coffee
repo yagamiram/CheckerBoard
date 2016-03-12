@@ -1,23 +1,55 @@
-# Cleanigng the code. 
-# Going with format of stemkoski
+###
+Class Board Controller 
+This class is the main core of the project.
+for loose coupling. 
+
+Board Controller does two main operations
+1. Initialize
+2. Animate
+
+Initialize:
+  It created the objetcts needed for a 3D game startinf from camera to checker board.
+Animate:
+  Whatever the objects added to the scene, it will rendered here.
+
+This whole file is written in coffesscript which will be transpiled to javascript
+during the compile time.
+
+More comments are given inline to the code.
+###
 class BoardController
   constructor: (@containerId, @assets) ->
-    @camera
-    @cameraController
-    @viewWidth = @containerId.offsetWidth
+    ### 
+    The constructor of the class gets the
+    document Id of HTML where the 3D game has to projected.
+    It gets the gallery folder called 3D assets from the variable @assets
+
+    To access most of the 3D objets across the various modules, 
+    the below variables are listed as member variable of this class.
+    ###
+    @camera # Takes care of the 3D camera features.
+    @cameraController # It tracks the mouse controls and correlates with the camera movement.
+    @viewWidth = @containerId.offsetWidth # This returns the width and height of the container in the HTML tag.
     @viewHeight = @containerId.offsetHeight
-    @squareSize = 10
-    @renderer
-    @scene
-    @lights = {}
-    @materials = {}
-    @is_start = false
-    @direction_board = []
+    @squareSize = 10 # Each cell in the checker board is assumed of size 10.
+    @renderer # An object that converts 3D to 2D and renders it in the screen.
+    @scene # It defines the area specified in the HTML where the checkboard will be placed.
+    @lights = {} # To illuminate the scene
+    @materials = {} # Several objects were used with different materials and they are stored in this object.
+    # This boolean tracks if the start button to start the game. This var is set to False by re-start, set-size and stop button
+    @has_start_button_clicked = false
+    # Each board has a random direction and to keep an eye of all the directions, this array object is used.  
+    @direction_board = [] 
+    # To detec the cycle in best cost effective way, an array is set with False during the start of the game
+    # The array will mark the cells that are already visited and helps to detect the cycle.
     @visited_board = []
+    # The current postion of the coin in the checkerboard is stored here. It changes whenver the coin moves.
     @current_location = []
-    @pieceObjGroup
-    @row = 7
+    # The checker coin it is.
+    @checker_coin
+    @row = 7 #The minimum number rows and columns of checker board is 8.
     @col = 7
+    # To stop proceeding further in the game this boolean variable is declared.
     @cycle_formed = false
   drawboard: ->
     # Loose coupling everyting here
@@ -71,15 +103,15 @@ class BoardController
   AddPiece: () ->
     that = @    
     Create_piece = (piece) ->
-      that.pieceObjGroup = new THREE.Object3D()
-      that.pieceObjGroup.name = "Checker_Piece"
-      that.pieceObjGroup.color = piece.color
+      that.checker_coin = new THREE.Object3D()
+      that.checker_coin.name = "Checker_Piece"
+      that.checker_coin.color = piece.color
       shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(that.squareSize, that.squareSize, 1, 1), that.materials.pieceShadowPlane)
       shadowPlane.rotation.x = -90 * Math.PI / 180 
-      that.pieceObjGroup.add(shadowPlane)
-      that.pieceObjGroup.position = that.boardToWorld(piece.pos)
-      #console.log "pieceObjGroup",that.pieceObjGroup
-      that.scene.add(that.pieceObjGroup)
+      that.checker_coin.add(shadowPlane)
+      that.checker_coin.position = that.boardToWorld(piece.pos)
+      #console.log "checker_coin",that.checker_coin
+      that.scene.add(that.checker_coin)
       return # end of create piece function
     random_piece = { color : 0x9f2200, pos : []}
     # Get a random location
@@ -105,11 +137,11 @@ class BoardController
     gui = new (dat.GUI)
     parameters = 
       start :   ->
-        that.is_start = true
-        console.log "the is_start is changed to ", that.is_start
+        that.has_start_button_clicked = true
+        console.log "the has_start_button_clicked is changed to ", that.has_start_button_clicked
         return
       stop : ->
-        that.is_start = false
+        that.has_start_button_clicked = false
         return
       set_size: ->
         console.log "either to update or remove the 3d model", c_row, c_col
@@ -122,7 +154,7 @@ class BoardController
           board.scale.z = 1 + (0.12 * (c_col - 7))
           that.row = c_row
           that.col = c_col
-          that.is_start = false
+          that.has_start_button_clicked = false
           that.cycle_formed = false
           that.direction_board = []
           that.visited_board = []
@@ -131,7 +163,7 @@ class BoardController
           that.AddPiece()          
         return # End of Set size function
       Restart : ->
-        that.is_start = false
+        that.has_start_button_clicked = false
         that.cycle_formed = false
         that.scene.remove(that.scene.getObjectByName("Checker_Board")) for each_col in [0..that.col] for each_row in [0..that.row]
         that.scene.remove(that.scene.getObjectByName("Checker_Piece"))
@@ -202,7 +234,7 @@ class BoardController
     loader = new THREE.JSONLoader()
     totalObjectsToLoad = 2
     loadedObjects = 0
-    pieceObjGroup = null
+    checker_coin = null
     is_tween_running = false
     current_location = []
     board_geometry = (geom) ->
@@ -227,9 +259,9 @@ class BoardController
       target1 = {x: to.x, y: 0, z: to.z, t: 0}
       tween1 = new (TWEEN.Tween)(values1).to(target1, 3000)
       tween1.onUpdate ->
-        that.pieceObjGroup.position.z = values1.z
-        that.pieceObjGroup.position.y = values1.y
-        that.pieceObjGroup.position.x = values1.x
+        that.checker_coin.position.z = values1.z
+        that.checker_coin.position.y = values1.y
+        that.checker_coin.position.x = values1.x
         return
       tween1.onComplete ->
         #console.log "tween1.onComplete is false"
@@ -238,7 +270,7 @@ class BoardController
       tween1.start()
       return # End of tween function
     update = ->
-      if that.is_start is true
+      if that.has_start_button_clicked is true
         while ( that.cycle_formed is false and is_tween_running == false )
           ##console.log "the current_location is", that.current_location[0], that.current_location[1] 
           if 0 > that.current_location[0] or that.current_location[0] > that.row or 0 > that.current_location[1] or that.current_location[1] > that.col 
