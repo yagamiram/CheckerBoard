@@ -16,7 +16,7 @@ Consider a checkerboard of unknown size. On each square is an arrow that randoml
     Include audio to make things more interesting.
     Add some style to make it look good.
 
-[Link](https://github.com/golgobot/programming-challenge)
+[Challenge Link](https://github.com/golgobot/programming-challenge)
 
 ### Project Development ###
 
@@ -27,6 +27,7 @@ Tween.js
 Dat-Gui.js
 
 [Three.js](https://github.com/mrdoob/three.js) [Tween.js](https://github.com/CreateJS/TweenJS) [Dat.gui.js] (https://github.com/dataarts/dat.gui)
+[Electron] (https://github.com/atom/electron)
 
 ```html
 <script src="js/three.min.js"></script>
