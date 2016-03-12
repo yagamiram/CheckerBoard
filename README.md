@@ -5,7 +5,7 @@ Jibo Robotics Challenge
 #### Challenge ####
 
 The aim of the project is to create a lightweight 3D checker board game that shows a visualization of a coin moving on the checker board.
-The game stops when the coin falls off from the board or it ends in a cycle.
+The game stops when the coin falls from the board or it ends in a cycle.
 
 Challenge Description:
 
