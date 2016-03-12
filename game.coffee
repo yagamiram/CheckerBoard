@@ -104,7 +104,6 @@ class BoardController
     c_col = 0
     gui = new (dat.GUI)
     parameters = 
-      e: '#ff8800'
       start :   ->
         that.is_start = true
         console.log "the is_start is changed to ", that.is_start
@@ -145,7 +144,6 @@ class BoardController
       x: 8
       y: 8
     # gui.add( parameters )
-    gui.addColor(parameters, 'e').name 'Color'
     gui.add(parameters, 'start').name 'Start'
     gui.add(parameters, 'stop').name 'Stop'
     gui.add(parameters, 'Restart').name 'Restart'
@@ -243,8 +241,13 @@ class BoardController
       if that.is_start is true
         while ( that.cycle_formed is false and is_tween_running == false )
           ##console.log "the current_location is", that.current_location[0], that.current_location[1] 
-          if 0 > that.current_location[0] or that.current_location[0] > that.row or 0 > that.current_location[1] or that.current_location[1] > that.col or that.visited_board[that.current_location[0]][that.current_location[1]] is true 
+          if 0 > that.current_location[0] or that.current_location[0] > that.row or 0 > that.current_location[1] or that.current_location[1] > that.col 
             ##console.log "Cycle formed", that.current_location[0], that.current_location[1]
+            alert "Oops! The coin fallen from the Londen Bridge aka from the Checker Board! Press Restart to start a new game"
+            that.cycle_formed = true
+            return
+          else if that.visited_board[that.current_location[0]][that.current_location[1]] is true
+            alert "Oops ! The coin is trapped in a cycle! Press Restart to start a new game"
             that.cycle_formed = true
             return
           that.visited_board[that.current_location[0]][that.current_location[1]] = true
